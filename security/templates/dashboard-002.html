@@ -236,16 +236,14 @@
                       <h6>Filtros</h6>
                     </li>
 
-                    <!-- Passando parâmetro "filtro" via GET -->
-                    <li><a class="dropdown-item" href="?filtro=hoje">Hoje</a></li>
-                    <li><a class="dropdown-item" href="?filtro=mes">Neste Mês</a></li>
-                    <li><a class="dropdown-item" href="?filtro=ano">Neste Ano</a></li>                    
-
+                    <li><a class="dropdown-item" href="#">Hoje</a></li>
+                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
+                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Históricos Recentes <span>| {{slct_Periodo}}</span></h5>
+                  <h5 class="card-title">Acessos Recentes <span>| Hoje</span></h5>
 
                   <table class="table table-borderless datatable">
                     <thead>
@@ -253,20 +251,46 @@
                         <th scope="col">#</th>
                         <th scope="col">Usuário</th>
                         <th scope="col">Atividade</th>
-                        <th scope="col">Cargo/Atribuição/Função</th>
+                        <th scope="col">Perfil</th>
                         <th scope="col">Data/Hora</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {% for Registros_Logs in Rgstrs_Logs  %}
-                        <tr>
-                          <th scope="row"><a href="#">#{{Registros_Logs.id}}</a></th>
-                          <td>{{Registros_Logs.Usuario}}</td>
-                          <td><a href="#" class="text-primary">{{Registros_Logs.Atividade}}</a></td>
-                          <td>{{Registros_Logs.Perfil_User}}</td>
-                          <td><span class="badge bg-success">{{Registros_Logs.DtHr_Atividade|date:"d/m/Y H:i"}}</span></td>
-                        </tr>
-                      {% endfor %}
+                      <tr>
+                        <th scope="row"><a href="#">#2457</a></th>
+                        <td>Leonardo Araujo</td>
+                        <td><a href="#" class="text-primary">Limpeza dental</a></td>
+                        <td>Veterinario</td>
+                        <td><span class="badge bg-success">10/09/2024 07:11</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2147</a></th>
+                        <td>Claudio Santos</td>
+                        <td><a href="#" class="text-primary">Agendar Exame Eletrocardiógrafo</a></td>
+                        <td>Gerente</td>
+                        <td><span class="badge bg-warning">10/09/2024 07:45</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2049</a></th>
+                        <td>Isabela Martins</td>
+                        <td><a href="#" class="text-primary">Limpeza dental</a></td>
+                        <td>Veterinario</td>
+                        <td><span class="badge bg-success">10/09/2024 09:47</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2644</a></th>
+                        <td>Bianca Rocha</td>
+                        <td><a href="#" class="text-primary">Cirurgia de esterilização</a></td>
+                        <td>Veterinario</td>
+                        <td><span class="badge bg-danger">10/09/2024 12:30</span></td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#">#2644</a></th>
+                        <td>Carla Nascimento</td>
+                        <td><a href="#" class="text-primary">Agendar Exame Eletrocardiógrafo</a></td>
+                        <td>Atendente</td>
+                        <td><span class="badge bg-success">11/09/2024 08:58</span></td>
+                      </tr>
                     </tbody>
                   </table>
 
@@ -274,6 +298,80 @@
 
               </div>
             </div><!-- End Recent Sales -->
+
+            <!-- Top Selling -->
+            <div class="col-12">
+              <div class="card top-selling overflow-auto">
+
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filtros</h6>
+                    </li>
+
+                    <li><a class="dropdown-item" href="#">Today</a></li>
+                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
+                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
+                  </ul>
+                </div>
+
+                <div class="card-body pb-0">
+                  <h5 class="card-title">Top Selling <span>| Hoje</span></h5>
+
+                  <table class="table table-borderless">
+                    <thead>
+                      <tr>
+                        <th scope="col">Preview</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Sold</th>
+                        <th scope="col">Revenue</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row"><a href="#"><img src="{% static 'security/static/assets/img/product-1.jpg' %}" alt=""></a></th>
+                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
+                        <td>$64</td>
+                        <td class="fw-bold">124</td>
+                        <td>$5,828</td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#"><img src="{% static 'security/static/assets/img/product-2.jpg' %}" alt=""></a></th>
+                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
+                        <td>$46</td>
+                        <td class="fw-bold">98</td>
+                        <td>$4,508</td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#"><img src="{% static 'security/static/assets/img/product-3.jpg' %}" alt=""></a></th>
+                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
+                        <td>$59</td>
+                        <td class="fw-bold">74</td>
+                        <td>$4,366</td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#"><img src="{% static 'security/static/assets/img/product-4.jpg' %}" alt=""></a></th>
+                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
+                        <td>$32</td>
+                        <td class="fw-bold">63</td>
+                        <td>$2,016</td>
+                      </tr>
+                      <tr>
+                        <th scope="row"><a href="#"><img src="{% static 'security/static/assets/img/product-5.jpg' %}" alt=""></a></th>
+                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
+                        <td>$79</td>
+                        <td class="fw-bold">41</td>
+                        <td>$3,239</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                </div>
+
+              </div>
+            </div><!-- End Top Selling -->
 
           </div>
         </div><!-- End Left side columns -->
@@ -290,7 +388,7 @@
                   <h6>Filtros</h6>
                 </li>
 
-                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
                 <li><a class="dropdown-item" href="#">Neste Mês</a></li>
                 <li><a class="dropdown-item" href="#">Neste Ano</a></li>
               </ul>
@@ -370,7 +468,7 @@
             </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Atividades por cidades <span>| {{slct_Periodo}}</span></h5>
+              <h5 class="card-title">Relatório de Atividades <span>| Setembro de 2025</span></h5>
 
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
@@ -378,7 +476,7 @@
                 document.addEventListener("DOMContentLoaded", () => {
                   var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
                     legend: {
-                      data: ['Adamantina', 'Lucélia']
+                      data: ['Gatos', 'Cachorros']
                     },
                     radar: {
                       // shape: 'circle',
@@ -413,11 +511,11 @@
                       type: 'radar',
                       data: [{
                           value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Adamantina'
+                          name: 'Gatos'
                         },
                         {
                           value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Lucélia'
+                          name: 'Cachorros'
                         }
                       ]
                     }]
@@ -428,7 +526,7 @@
             </div>
           </div><!-- Final do Relatório de Atividades -->
 
-          <!-- Assinaturas Atividades -->
+          <!-- Website Traffic -->
           <div class="card">
             <div class="filter">
               <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -437,19 +535,17 @@
                   <h6>Filtros</h6>
                 </li>
 
-                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Today</a></li>
                 <li><a class="dropdown-item" href="#">Neste Mês</a></li>
                 <li><a class="dropdown-item" href="#">Neste Ano</a></li>
               </ul>
             </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Assinaturas Atividades <span>| Hoje</span></h5>
+              <h5 class="card-title">Website Traffic <span>| Hoje</span></h5>
 
               <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
 
-
-              Assinaturas Atividades
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
                   echarts.init(document.querySelector("#trafficChart")).setOption({
@@ -461,7 +557,7 @@
                       left: 'center'
                     },
                     series: [{
-                      name: 'Acessados',
+                      name: 'Access From',
                       type: 'pie',
                       radius: ['40%', '70%'],
                       avoidLabelOverlap: false,
@@ -480,24 +576,24 @@
                         show: false
                       },
                       data: [{
-                          value: 948,
-                          name: 'Login'
+                          value: 1048,
+                          name: 'Search Engine'
                         },
                         {
                           value: 735,
-                          name: 'Exames'
+                          name: 'Direct'
                         },
                         {
                           value: 580,
-                          name: 'Cadastro'
+                          name: 'Email'
                         },
                         {
                           value: 484,
-                          name: 'Notificações'
+                          name: 'Union Ads'
                         },
                         {
                           value: 300,
-                          name: 'Consultas'
+                          name: 'Video Ads'
                         }
                       ]
                     }]
@@ -506,9 +602,142 @@
               </script>
 
             </div>
-          </div>
-          <!-- Finalização: Assinaturas Atividades -->
+          </div><!-- End Website Traffic -->
 
+          <!-- News & Updates Traffic -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtros</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Today</a></li>
+                <li><a class="dropdown-item" href="#">Neste Mês</a></li>
+                <li><a class="dropdown-item" href="#">Neste Ano</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">News &amp; Updates <span>| Hoje</span></h5>
+
+              <div class="news">
+                <div class="post-item clearfix">
+                  <img src="assets/img/news-1.jpg" alt="">
+                  <h4><a href="#">Nihil blanditiis at in nihil autem</a></h4>
+                  <p>Sit recusandae non aspernatur laboriosam. Quia enim eligendi sed ut harum...</p>
+                </div>
+
+                <div class="post-item clearfix">
+                  <img src="assets/img/news-2.jpg" alt="">
+                  <h4><a href="#">Quidem autem et impedit</a></h4>
+                  <p>Illo nemo neque maiores vitae officiis cum eum turos elan dries werona nande...</p>
+                </div>
+
+                <div class="post-item clearfix">
+                  <img src="assets/img/news-3.jpg" alt="">
+                  <h4><a href="#">Id quia et et ut maxime similique occaecati ut</a></h4>
+                  <p>Fugiat voluptas vero eaque accusantium eos. Consequuntur sed ipsam et totam...</p>
+                </div>
+
+                <div class="post-item clearfix">
+                  <img src="assets/img/news-4.jpg" alt="">
+                  <h4><a href="#">Laborum corporis quo dara net para</a></h4>
+                  <p>Qui enim quia optio. Eligendi aut asperiores enim repellendusvel rerum cuder...</p>
+                </div>
+
+                <div class="post-item clearfix">
+                  <img src="assets/img/news-5.jpg" alt="">
+                  <h4><a href="#">Et dolores corrupti quae illo quod dolor</a></h4>
+                  <p>Odit ut eveniet modi reiciendis. Atque cupiditate libero beatae dignissimos eius...</p>
+                </div>
+
+              </div><!-- End sidebar recent posts-->
+
+            </div>
+          </div><!-- End News & Updates -->
+
+          <!-- Relatório de Cidades -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtros</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Agosto</a></li>
+                <li><a class="dropdown-item" href="#">Julho</a></li>
+                <li><a class="dropdown-item" href="#">Junho</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Relatório de Cidades <span>| Setembro de 2025</span></h5>
+
+              <div id="cidadeChart" style="min-height: 400px;" class="echart"></div>
+
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  var cidadeChart = echarts.init(document.querySelector("#cidadeChart")).setOption({
+                    scales: {
+                      r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 100
+                      }
+                    },                    
+                    legend: {
+                      data: ['Adamantina', 'Lucélia']
+                    },
+                    radar: {
+                      // shape: 'circle',
+                      indicator: [{
+                          name: 'Vacinação',
+                          max: 6500
+                        },
+                        {
+                          name: 'Cirurgia',
+                          max: 16000
+                        },
+                        {
+                          name: 'Exames',
+                          max: 30000
+                        },
+                        {
+                          name: 'Consultas',
+                          max: 38000
+                        },
+                        {
+                          name: 'Procedimentos Estéticos',
+                          max: 52000
+                        },
+                        {
+                          name: 'Internações',
+                          max: 25000
+                        }
+                      ]
+                    },
+                    series: [{
+                      name: 'Cidades',
+                      type: 'radar',
+                      data: [{
+                          value: [4200, 3000, 20000, 35000, 50000, 18000],
+                          name: 'Adamantina'
+                        },
+                        {
+                          value: [5000, 14000, 28000, 26000, 42000, 21000],
+                          name: 'Lucélia'
+                        }
+                      ],
+                    }]
+                  });
+                });
+              </script>
+
+            </div>
+          </div><!-- Final do Relatório de Atividades -->
 
 
 
@@ -519,17 +748,15 @@
 
   </main><!-- End #main -->
 
-    <!--Ativa as opções do menu principal esquerdo -->
+      <!--Ativa as opções do menu principal esquerdo -->
     <script language="JavaScript">
 		<!--
             document.getElementById('security-nav').className ='nav-content collapse show';
             document.getElementById('sidebar-nav-security-mapa').className ='active';
-         
 		//-->
-	  </script>
-
-
+	</script>
+  
+ 
 {% endblock 'body' %}
-
 
 </html>

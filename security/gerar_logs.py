@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 nomes = [
     "Carlos Henrique", "Fernanda Souza", "Marcos Paulo", "Juliana Almeida",
     "Rodrigo Santos", "Patrícia Lima", "Gustavo Ribeiro", "Camila Fernandes",
-    "Eduardo Martins", "Tatiane Pereira"
+    "Eduardo Martins", "Tatiane Pereira", "Mariana Maria Macedo", "Helena Joaquina"
 ]
 
 cidades = [
@@ -15,9 +15,9 @@ cidades = [
 
 atividades = [
     "Login no sistema",
-    "Consulta de pacientes",
+    "Consulta de Pets",
     "Atualização de cadastro",
-    "Cadastro de novo paciente",
+    "Cadastro de novo PETs",
     "Visualização de relatórios",
     "Edição de perfil",
     "Agendamento de consulta",
@@ -27,12 +27,12 @@ atividades = [
 ]
 
 # Datas de início e fim
-inicio = datetime(2022, 1, 1)
-fim = datetime(2025, 9, 30)
+inicio = datetime(2025, 10, 1)
+fim = datetime(2025, 12, 31)
 
 # Parâmetros fixos
 country = "Brasil"
-perfil = "Usuário"
+perfils = ["Atendente", "Gerente", "Cliente", "Médico", "Estagiário"]
 uf_id = 25   # São Paulo
 user_id = 1  # Ajuste conforme seu banco de dados
 
@@ -66,6 +66,7 @@ while current_date <= fim:
         bairro = random.choice(
             ["Centro", "Jardim Bela Vista", "Vila Industrial", "Jardim das Palmeiras"])
         ip = f"187.{random.randint(0, 255)}.{random.randint(0, 255)}.{random.randint(0, 255)}"
+        perfil = random.choice(perfils)
 
         values.append(
             f"('{nome}', '{cep}', '{endereco}', '{numero}', '{bairro}', '{cidade['url']}', "
