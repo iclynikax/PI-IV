@@ -48,12 +48,12 @@ current_date = inicio
 values = []
 
 while current_date <= fim:
-    num_logs = random.randint(3, 15)
+    num_logs = random.randint(22, 25)
     for _ in range(num_logs):
         nome = random.choice(nomes)
         cidade = random.choice(cidades)
         atividade = random.choice(atividades)
-        hora = random.randint(7, 22)
+        hora = random.randint(22, 23)
         minuto = random.randint(0, 59)
         segundo = random.randint(0, 59)
         dt = current_date.replace(hour=hora, minute=minuto, second=segundo)

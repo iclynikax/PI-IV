@@ -40,28 +40,15 @@
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card sales-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filtros</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Hoje</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Acessos <span>| Hoje: 30 Setembro 2025</span></h5>
+                  <h5 class="card-title">Acessos <span>| {{diaAnoCorrente|date:"d \d\e F \d\e Y"}} </span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
+                      <i class="bi bi-unlock"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>145</h6>
+                      <h6>{{nTtldiaCorrente}}</h6>
                       <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">Aumentando</span>
 
                     </div>
@@ -75,28 +62,15 @@
             <div class="col-xxl-4 col-md-6">
               <div class="card info-card revenue-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filtros</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Hoje</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Usuários <span>| Mês : Setembro 2025</span></h5>
+                  <h5 class="card-title">Usuários <span>| {{mesAnoCorrente}}</span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar"></i>
+                      <i class="bi bi-graph-up"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>264</h6>
+                      <h6>{{nTtlMesCorrente}}</h6>
                       <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">Aumentando</span>
 
                     </div>
@@ -111,28 +85,15 @@
 
               <div class="card info-card customers-card">
 
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filtros</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Hoje</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
-                  </ul>
-                </div>
-
                 <div class="card-body">
-                  <h5 class="card-title">Clientes<span title="2025"> | 2025</span></h5>
+                  <h5 class="card-title">Clientes<span title="2025"> | {{anoCorrente}}</span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
+                      <i class="bi bi-bar-chart"></i>
                     </div>
                     <div class="ps-3">
-                      <h6>1244</h6>
+                      <h6>{{nTtlAnoCorrente}}</h6>
                       <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">Diminuindo</span>
 
                     </div>
@@ -153,71 +114,99 @@
                     <li class="dropdown-header text-start">
                       <h6>Filtros</h6>
                     </li>
-
-                    <li><a class="dropdown-item" href="#">Hoje</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Mês</a></li>
-                    <li><a class="dropdown-item" href="#">Neste Ano</a></li>
+                    <li><a class="dropdown-item" id="Hoje" onClick="acssaRelatorio(this)">Hoje</a></li>
+                    <li><a class="dropdown-item" id="Mes" onClick="acssaRelatorio(this)">Neste Mês</a></li>
+                    <li><a class="dropdown-item" id="Ano" onClick="acssaRelatorio(this)">Neste Ano</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Relatórios <span>/Hoje</span></h5>
+                  <h5 class="card-title">Relatórios <span>| {{slct_Periodo}}</span></h5>
 
                   <!-- Line Chart -->
                   <div id="reportsChart"></div>
 
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                          name: 'Acessos',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Usuários',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Clientes',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
-                        chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
-                        },
-                        markers: {
-                          size: 4
-                        },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
-                        dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
-                        },
-                        xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                        },
-                        tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
+                    <script>
+                      document.addEventListener("DOMContentLoaded", () => {
+                        // Gera 24 timestamps para o dia atual
+                        const hoje = new Date();
+                        const ano = hoje.getFullYear();
+                        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                        const dia = String(hoje.getDate()).padStart(2, '0');
+
+                        const categorias = [];
+                        for (let h = 0; h < 25; h++) {
+                          const hora = String(h).padStart(2, '0');
+                          categorias.push(`${ano}-${mes}-${dia}T${hora}:00:00.000Z`);
                         }
-                      }).render();
-                    });
-                  </script>
+
+                        const acessos = {{ slct_Acessos|safe }};
+                        const cliente = {{ slct_Cliente|safe }};
+                        const medico = {{ slct_Medico|safe }};
+                        const atendente = {{ slct_Atendente|safe }};
+                        const gerente = {{ slct_Gerente|safe }};
+                        const estagiario = {{ slct_Estagiario|safe }};
+
+                        new ApexCharts(document.querySelector("#reportsChart"), {
+                          series: [{
+                            name: 'Acessos',
+                            data: acessos,
+                          }, {
+                            name: 'Clientes',
+                            data: cliente
+                          }, {
+                            name: 'Médicos',
+                            data: medico
+                          }, {
+                            name: 'Atendentes',
+                            data: atendente
+                          }, {
+                            name: 'Gerentes',
+                            data: gerente
+                          }, {
+                            name: 'Estagiários',
+                            data: estagiario
+                          }
+                          ],
+                          chart: {
+                            height: 350,
+                            type: 'area',
+                            toolbar: {
+                              show: false
+                            },
+                          },
+                          markers: {
+                            size: 4
+                          },
+                          colors: ['#4154f1', '#2eca6a', '#ff771d', '#00bcd4', '#ffc107', '#9c27b0'],
+                          fill: {
+                            type: "gradient",
+                            gradient: {
+                              shadeIntensity: 1,
+                              opacityFrom: 0.3,
+                              opacityTo: 0.4,
+                              stops: [0, 90, 100]
+                            }
+                          },
+                          dataLabels: {
+                            enabled: false
+                          },
+                          stroke: {
+                            curve: 'smooth',
+                            width: 2
+                          },
+                          xaxis: {
+                            type: 'datetime',
+                            categories: categorias
+                          },
+                          tooltip: {
+                            x: {
+                              format: 'dd/MM/yy HH:mm'
+                            },
+                          }
+                        }).render();
+                      });
+                    </script>
                   <!-- End Line Chart -->
 
                 </div>
@@ -301,53 +290,37 @@
 
               <div class="activity">
 
-                <div class="activity-item d-flex">
-                  <div class="activite-label">32 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                  <div class="activity-content">
-                    Login no sistema <a href="#" class="fw-bold text-dark">Controle de Estoque</a> Acesso Positivo
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">56 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                  <div class="activity-content">
-                    Enviou Notificação 
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 hrs</div>
-                  <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                  <div class="activity-content">
-                    Respondeu Notificação - Não Aprovado
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">1 day</div>
-                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                  <div class="activity-content">
-                    Atualização de cadastro<a href="#" class="fw-bold text-dark">Juliana Almeida</a> tempore
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 days</div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content">
-                    Consulta de Conta Corrente - Paciente
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">4 weeks</div>
-                  <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                  <div class="activity-content">
-                    Agendamento de consulta - PET: Cachorro - BullDog
-                  </div>
-                </div><!-- End activity item-->
+                {% for CncoUltmo in Slct5UltmosRgstrosDeHoje  %}
+                  <tr>
+                    <div class="activity-item d-flex">
+                      <div title="{{CncoUltmo.id}}" class="activite-label" title="{{ CncoUltmo.DtHr_Atividade }}">{{ CncoUltmo.DtHr_Atividade|timesince }}</div>
+                        <i class="bi bi-circle-fill activity-badge 
+                          {% if CncoUltmo.Perfil_User == 'Gerente' %}
+                              text-success
+                          {% else %}
+                            {% if CncoUltmo.Perfil_User == 'Cliente' %}
+                                text-danger
+                            {% else %}
+                              {% if CncoUltmo.Perfil_User == 'Médico' %}
+                                  text-info
+                              {% else %}
+                                {% if CncoUltmo.Perfil_User == 'Paciente' %}
+                                    text-warning
+                                {% else %}
+                                  {# Os Estagiarios enquadram aqui. #}
+                                    text-primary 
+                                {% endif %}
+                              {% endif %}
+                            {% endif %}
+                          {% endif %}
+                          align-self-start">
+                        </i>
+                      <div class="activity-content">
+                        {{CncoUltmo.Atividade}} <a href="#" title="{{CncoUltmo.Usuario}}" class="fw-bold text-dark">{{CncoUltmo.Perfil_User}}</a>
+                      </div>
+                    </div>
+                {% endfor %}                
+                <!-- End activity item-->
 
               </div>
 
@@ -370,7 +343,7 @@
             </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Atividades por cidades <span>| {{slct_Periodo}}</span></h5>
+              <h5 class="card-title">Atividades por cidades <span>| {{mesAnoCorrente}}</span></h5>
 
               <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
 
@@ -378,48 +351,38 @@
                 document.addEventListener("DOMContentLoaded", () => {
                   var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
                     legend: {
-                      data: ['Adamantina', 'Lucélia']
-                    },
+                      data: [
+                            {% for cidade in Rgstrs_Cddes %}
+                              '{{ cidade }}'{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                          ]
+                        },
                     radar: {
                       // shape: 'circle',
-                      indicator: [{
-                          name: 'Vacinação',
-                          max: 6500
-                        },
-                        {
-                          name: 'Cirurgia',
-                          max: 16000
-                        },
-                        {
-                          name: 'Exames',
-                          max: 30000
-                        },
-                        {
-                          name: 'Consultas',
-                          max: 38000
-                        },
-                        {
-                          name: 'Procedimentos Estéticos',
-                          max: 52000
-                        },
-                        {
-                          name: 'Internações',
-                          max: 25000
-                        }
-                      ]
-                    },
+                        indicator: [
+                          {% for atividade in Rgstrs_Atvddes %}
+                          {
+                            name: '{{ atividade.atvddeNome }}',
+                            max: {{Rgstrs_MaxAtvddes}}
+                          }{% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                        ]
+                      },
                     series: [{
                       name: 'Budget vs spending',
                       type: 'radar',
-                      data: [{
-                          value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Adamantina'
-                        },
+                      data: [
+                        {% for cidade in Rgstrs_Series %}
                         {
-                          value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Lucélia'
-                        }
-                      ]
+                          value: [
+                            {% for valor in cidade.value %}
+                              {{ valor }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                          ],
+                          name: '{{ cidade.name }}'
+                        }{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                      ]                            
                     }]
                   });
                 });
@@ -444,12 +407,8 @@
             </div>
 
             <div class="card-body pb-0">
-              <h5 class="card-title">Assinaturas Atividades <span>| Hoje</span></h5>
-
-              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
-
-              Assinaturas Atividades
+              <h5 class="card-title">Assinaturas das Atividades <span>| {{mesAnoCorrente}}</span></h5>
+                  <div id="trafficChart" style="min-height: 385px;" class="echart"></div>
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
                   echarts.init(document.querySelector("#trafficChart")).setOption({
@@ -457,13 +416,14 @@
                       trigger: 'item'
                     },
                     legend: {
-                      top: '5%',
+                      top: '0%',
                       left: 'center'
                     },
                     series: [{
-                      name: 'Acessados',
+                      top: '25%',
+                      name: 'Assinados:',
                       type: 'pie',
-                      radius: ['40%', '70%'],
+                      radius: ['40%', '85%'],
                       avoidLabelOverlap: false,
                       label: {
                         show: false,
@@ -479,26 +439,14 @@
                       labelLine: {
                         show: false
                       },
-                      data: [{
-                          value: 948,
-                          name: 'Login'
-                        },
-                        {
-                          value: 735,
-                          name: 'Exames'
-                        },
-                        {
-                          value: 580,
-                          name: 'Cadastro'
-                        },
-                        {
-                          value: 484,
-                          name: 'Notificações'
-                        },
-                        {
-                          value: 300,
-                          name: 'Consultas'
-                        }
+                      data: [
+                        {% for Atividade in Rgstrs_Atvddes %}
+                          {
+                            value: {{ Atividade.atvddeValor }},
+                            name: '{{ Atividade.atvddeNome }}'
+                          }
+                          {% if not forloop.last %},{% endif %}
+                        {% endfor %},
                       ]
                     }]
                   });
@@ -527,6 +475,43 @@
          
 		//-->
 	  </script>
+
+<script>
+  function acessaRelatorio(elemento) {
+    const filtro = elemento.id;
+
+    fetch('/relatorio/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')  // importante para segurança
+      },
+      body: JSON.stringify({ filtro: filtro })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Aqui você pode atualizar a página com os dados recebidos
+      console.log(data);
+      // Exemplo: document.getElementById("resultado").innerHTML = data.html;
+    });
+  }
+
+  // Função para pegar o CSRF token do cookie
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
 
 
 {% endblock 'body' %}
