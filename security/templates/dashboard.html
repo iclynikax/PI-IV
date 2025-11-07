@@ -3,11 +3,15 @@
 <!doctype html>
 <html lang="pt-BR">
 
-{% block 'head' %}
+{% block 'title' %}
 
   <title>iClynikaX : Security - Dashboard</title>
 
-{% endblock 'head' %}
+  <!-- Functions geral de javascripts -->
+  <script src="{% static 'geral/js/myFunctions.js' %}?v={% now 'YmdHis' %}"></script>
+
+
+{% endblock 'title' %}
 
 
 
@@ -63,7 +67,7 @@
               <div class="card info-card revenue-card">
 
                 <div class="card-body">
-                  <h5 class="card-title">Usuários <span>| {{mesAnoCorrente}}</span></h5>
+                  <h5 class="card-title">Usuários <span>| {{mesAnoCorrente}} de {{anoCorrente}}</span></h5>
 
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
@@ -107,6 +111,9 @@
             <!-- Reports -->
             <div class="col-12">
               <div class="card">
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                </div>
 
                 <div class="filter">
                   <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
@@ -114,97 +121,65 @@
                     <li class="dropdown-header text-start">
                       <h6>Filtros</h6>
                     </li>
-                    <li><a class="dropdown-item" id="Hoje" onClick="acssaRelatorio(this)">Hoje</a></li>
-                    <li><a class="dropdown-item" id="Mes" onClick="acssaRelatorio(this)">Neste Mês</a></li>
-                    <li><a class="dropdown-item" id="Ano" onClick="acssaRelatorio(this)">Neste Ano</a></li>
+                    <li><a class="dropdown-item" id="hoje" onClick="acssaRltrio('hoje')">Hoje</a></li>
+                    <li><a class="dropdown-item" id="mes" onClick="acssaRltrio('mes')">Neste Mês</a></li>
+                    <li><a class="dropdown-item" id="ano" onClick="acssaRltrio('ano')">Neste Ano</a></li>
                   </ul>
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Relatórios <span>| {{slct_Periodo}}</span></h5>
+                  <h5 class="card-title">Relatórios <span>|
+                    <!-- Botão para direcionar ao periodo anterior selecionado -->
+                    <a class="icon" data-tooltip='Acessa o mês Anterior: Não Atualizado' href="#" data-bs-toggle="dropdown">
+                      <i onclick="acssaPrdoAntror(this);" name="Periodo_Anterior" id="{{mesAnoCorrente}} de {{anoCorrente}}"
+                        class="bi bi-arrow-left-square-fill"
+                        style="cursor: pointer;">
+                      </i>
+                    </a>
+                    {{slct_Periodo}}
+                    <!-- Botão para direcionar ao periodo posterior/seguinte selecionado -->
+                    <a class="icon" data-tooltip='Acessa o mês Seguinte: Não Atualizado' href="#" data-bs-toggle="dropdown">
+                      <i onclick="acssaPrdoPstror(this);" name="Periodo_Posterior"
+                        {% if filtro == 'mes' %}
+                          id="{{ mesAnoCorrente }}/{{ anoCorrente }}"
+                        {% elif filtro == 'dia' %}
+                          id="{{ slct_PrxPrdo }}"
+                        {% endif %}                     
+                        class="bi bi-arrow-right-square-fill"
+                        style="cursor: pointer;">
+                      </i>
+                    </a></span>
+                  </h5>
 
                   <!-- Line Chart -->
-                  <div id="reportsChart"></div>
-
+                    <div id="reportsChart" style="min-height: 350px;"></div>
                     <script>
-                      document.addEventListener("DOMContentLoaded", () => {
-                        // Gera 24 timestamps para o dia atual
-                        const hoje = new Date();
-                        const ano = hoje.getFullYear();
-                        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-                        const dia = String(hoje.getDate()).padStart(2, '0');
+                      // Gera 24 timestamps para o dia atual
+                      const hoje = new Date();
+                      const ano = hoje.getFullYear();
+                      const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                      const dia = String(hoje.getDate()).padStart(2, '0');
+                      const hora = String(hoje.getHours()).padStart(2, '0'); // ✅ Adiciona isso
 
-                        const categorias = [];
-                        for (let h = 0; h < 25; h++) {
-                          const hora = String(h).padStart(2, '0');
-                          categorias.push(`${ano}-${mes}-${dia}T${hora}:00:00.000Z`);
-                        }
+                      const filtro = "{{ slct_Filtro|escapejs }}"; // Django: escapa corretamente para JS
 
-                        const acessos = {{ slct_Acessos|safe }};
-                        const cliente = {{ slct_Cliente|safe }};
-                        const medico = {{ slct_Medico|safe }};
-                        const atendente = {{ slct_Atendente|safe }};
-                        const gerente = {{ slct_Gerente|safe }};
-                        const estagiario = {{ slct_Estagiario|safe }};
+                      const categorias = gerarCategorias(`${filtro}`, new Date(`${ano}-${mes}-${dia}T${hora}:00:00.000Z`)); 
 
-                        new ApexCharts(document.querySelector("#reportsChart"), {
-                          series: [{
-                            name: 'Acessos',
-                            data: acessos,
-                          }, {
-                            name: 'Clientes',
-                            data: cliente
-                          }, {
-                            name: 'Médicos',
-                            data: medico
-                          }, {
-                            name: 'Atendentes',
-                            data: atendente
-                          }, {
-                            name: 'Gerentes',
-                            data: gerente
-                          }, {
-                            name: 'Estagiários',
-                            data: estagiario
-                          }
-                          ],
-                          chart: {
-                            height: 350,
-                            type: 'area',
-                            toolbar: {
-                              show: false
-                            },
-                          },
-                          markers: {
-                            size: 4
-                          },
-                          colors: ['#4154f1', '#2eca6a', '#ff771d', '#00bcd4', '#ffc107', '#9c27b0'],
-                          fill: {
-                            type: "gradient",
-                            gradient: {
-                              shadeIntensity: 1,
-                              opacityFrom: 0.3,
-                              opacityTo: 0.4,
-                              stops: [0, 90, 100]
-                            }
-                          },
-                          dataLabels: {
-                            enabled: false
-                          },
-                          stroke: {
-                            curve: 'smooth',
-                            width: 2
-                          },
-                          xaxis: {
-                            type: 'datetime',
-                            categories: categorias
-                          },
-                          tooltip: {
-                            x: {
-                              format: 'dd/MM/yy HH:mm'
-                            },
-                          }
-                        }).render();
+                      const acessos = {{ slct_Acessos|safe }};
+                      const cliente = {{ slct_Cliente|safe }};
+                      const medico = {{ slct_Medico|safe }};
+                      const atendente = {{ slct_Atendente|safe }};
+                      const gerente = {{ slct_Gerente|safe }};
+                      const estagiario = {{ slct_Estagiario|safe }};
+
+                      let formatoTooltip;
+                      if (filtro === 'hoje') {
+                        formatoTooltip = 'dd/MM/yy HH:mm';
+                      } else if (filtro === 'mes') {
+                        formatoTooltip = 'dd/MM/yyyy';
+                      } else if (filtro === 'ano') {
+                        formatoTooltip = 'MMM/yyyy';
+                      }                        
                       });
                     </script>
                   <!-- End Line Chart -->
@@ -219,7 +194,7 @@
               <div class="card recent-sales overflow-auto">
 
                 <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <a class="icon" data-tooltip='' href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
                   <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <li class="dropdown-header text-start">
                       <h6>Filtros</h6>
@@ -234,7 +209,7 @@
                 </div>
 
                 <div class="card-body">
-                  <h5 class="card-title">Históricos Recentes <span>| {{slct_Periodo}}</span></h5>
+                  <h5 class="card-title">Registros de Logs<span> | {{slct_Periodo}}</span></h5>
 
                   <table class="table table-borderless datatable">
                     <thead>
@@ -272,57 +247,46 @@
 
           <!-- Acessos Recentes -->
           <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filtros</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Hoje</a></li>
-                <li><a class="dropdown-item" href="#">Neste Mês</a></li>
-                <li><a class="dropdown-item" href="#">Neste Ano</a></li>
-              </ul>
-            </div>
-
             <div class="card-body">
               <h5 class="card-title">Acessos Recentes <span>| Hoje</span></h5>
 
               <div class="activity">
-
                 {% for CncoUltmo in Slct5UltmosRgstrosDeHoje  %}
                   <tr>
                     <div class="activity-item d-flex">
-                      <div title="{{CncoUltmo.id}}" class="activite-label" title="{{ CncoUltmo.DtHr_Atividade }}">{{ CncoUltmo.DtHr_Atividade|timesince }}</div>
-                        <i class="bi bi-circle-fill activity-badge 
-                          {% if CncoUltmo.Perfil_User == 'Gerente' %}
-                              text-success
+                      <div title="{{CncoUltmo.id}}" class="activite-label" title="{{ CncoUltmo.DtHr_Atividade }}">
+                        {{ CncoUltmo.DtHr_Atividade|timesince }}
+                      </div>
+                      <i class="bi bi-circle-fill activity-badge 
+                        {% if CncoUltmo.Perfil_User == 'Gerente' %}
+                            text-success
+                        {% else %}
+                          {% if CncoUltmo.Perfil_User == 'Cliente' %}
+                              text-danger
                           {% else %}
-                            {% if CncoUltmo.Perfil_User == 'Cliente' %}
-                                text-danger
+                            {% if CncoUltmo.Perfil_User == 'Médico' %}
+                                text-info
                             {% else %}
-                              {% if CncoUltmo.Perfil_User == 'Médico' %}
-                                  text-info
+                              {% if CncoUltmo.Perfil_User == 'Paciente' %}
+                                  text-warning
                               {% else %}
-                                {% if CncoUltmo.Perfil_User == 'Paciente' %}
-                                    text-warning
-                                {% else %}
-                                  {# Os Estagiarios enquadram aqui. #}
-                                    text-primary 
-                                {% endif %}
+                                {# Os Estagiarios enquadram aqui. #}
+                                  text-primary 
                               {% endif %}
                             {% endif %}
                           {% endif %}
-                          align-self-start">
-                        </i>
-                      <div class="activity-content">
-                        {{CncoUltmo.Atividade}} <a href="#" title="{{CncoUltmo.Usuario}}" class="fw-bold text-dark">{{CncoUltmo.Perfil_User}}</a>
+                        {% endif %}
+                        align-self-start">
+                      </i>
+                      <div class="activity-content">{{CncoUltmo.Atividade}}
+                        <a href="#" title="{{CncoUltmo.Usuario}}" class="fw-bold text-dark">
+                          {{CncoUltmo.Perfil_User}}
+                        </a>
                       </div>
                     </div>
                 {% endfor %}                
-                <!-- End activity item-->
-
               </div>
+              <!-- End activity item-->
 
             </div>
           </div><!-- End Recent Activity -->
@@ -349,8 +313,33 @@
 
               <script>
                 document.addEventListener("DOMContentLoaded", () => {
-                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                    legend: {
+                // Defina os nomes das atividades como uma variável global
+                const labels = [
+                  {% for atividade in Rgstrs_Atvddes %}
+                    '{{ atividade.atvddeNome }}'{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                ];
+
+                var budgetChart = echarts.init(document.querySelector("#budgetChart"));
+                  budgetChart.setOption({
+                      tooltip: {
+                          trigger: 'item',
+                          formatter: function (params) {
+                              let output = `
+                                  <div style="text-align: center;background-color: black; color: white; font-family: 'Times New Roman', serif; font-weight: bold; font-size: 14px;">${params.name}</div>
+
+
+                                  <pre style="font-family: monospace; margin: 0;">`;
+                                  params.value.forEach((val, idx) => {
+                                      const nome = labels[idx];
+                                      const linha = nome.padEnd(40, '.') + ' ' + val.toString().padStart(2, ' ');
+                                      const bgColor = idx % 2 === 0 ? '#f0f0f0' : '#e0e0e0'; // alterna cor
+                                      output += `<div style="background-color:${bgColor};">${linha}</div>`;
+                                  });
+                                  return output;
+                              }
+                      },
+                      legend: {
                       data: [
                             {% for cidade in Rgstrs_Cddes %}
                               '{{ cidade }}'{% if not forloop.last %},{% endif %}
@@ -467,54 +456,299 @@
 
   </main><!-- End #main -->
 
-    <!--Ativa as opções do menu principal esquerdo -->
-    <script language="JavaScript">
-		<!--
-            document.getElementById('security-nav').className ='nav-content collapse show';
-            document.getElementById('sidebar-nav-security-mapa').className ='active';
-         
-		//-->
-	  </script>
+  <!--Ativa as opções do menu principal esquerdo -->
+  <script language="JavaScript">
+  <!--
+          document.getElementById('security-nav').className ='nav-content collapse show';
+          document.getElementById('sidebar-nav-security-mapa').className ='active';
+        
+  //-->
+  </script>
 
-<script>
-  function acessaRelatorio(elemento) {
-    const filtro = elemento.id;
 
-    fetch('/relatorio/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCookie('csrftoken')  // importante para segurança
-      },
-      body: JSON.stringify({ filtro: filtro })
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Aqui você pode atualizar a página com os dados recebidos
-      console.log(data);
-      // Exemplo: document.getElementById("resultado").innerHTML = data.html;
-    });
-  }
 
-  // Função para pegar o CSRF token do cookie
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === (name + '=')) {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
+  <script>
+    function acessaRelatorio(elemento) {
+      const filtro = elemento.id;
+
+      fetch('/relatorio/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': getCookie('csrftoken')  // importante para segurança
+        },
+        body: JSON.stringify({ filtro: filtro })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Aqui você pode atualizar a página com os dados recebidos
+        console.log(data);
+        // Exemplo: document.getElementById("resultado").innerHTML = data.html;
+      });
+    }
+
+    // Função para pegar o CSRF token do cookie
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
         }
       }
+      return cookieValue;
     }
-    return cookieValue;
-  }
-</script>
+
+    
+    function acssaPrdoAntror(obj){
+      const meses = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+      ];
+
+      // Extrai mês e ano da string
+      const [mesTexto, anoTexto] = obj.id.split(" de ");
+      const mesIndex = meses.indexOf(mesTexto);
+
+      let novoMesIndex = mesIndex - 1;
+      let novoAno = parseInt(anoTexto);
+
+      // Se for Janeiro, volta para Dezembro do ano anterior
+      if (novoMesIndex < 0) {
+        novoMesIndex = 11;
+        novoAno -= 1;
+      }
+
+      const mesAnterior = meses[novoMesIndex];
+      const novoTooltip = `Acessa o mês Anterior: ${mesAnterior}/${novoAno}`;
+
+      // Atualiza o atributo data-tooltip do <a> pai
+      const pai = obj.closest("a");
+      if (pai) {
+        pai.setAttribute("data-tooltip", novoTooltip);
+      }
+    }
+
+    function acssaPrdoPstror(obj){
+      // Seleciona o elemento <i> com base no atributo name
+      const el = document.querySelector('i[name="Periodo_Posterior"]');
+      const pai = el.closest("a");
+      const textoCompleto = pai.dataset.tooltip;
+      
+
+      // Acessa uma function na view para que seja atualizado os dados de Relatório do Dia/Mês/Ano Seguinte
+      if (textoCompleto.includes(" às ")) {
+        const apenasDiaMesAno = textoCompleto.split(": ")[1];  // Saida 7 de Novembro de 2025
+        alert(apenasDiaMesAno); 
+      }      
+      else if (textoCompleto.includes("/")) {
+        const apenasMesAno = textoCompleto.split(": ")[1]; // Saída: "Dezembro/2025"
+        alert(apenasMesAno); 
+      }
+      else {
+        const apenasAno = textoCompleto.split(": ")[1]; // Saída: "2026"
+        alert(apenasAno); 
+      }    
+    }
+
+    //----------------------------------------------------------------------------------- Atualiza os valores de Title dos botões de relatórios
+    // Atualiza o botão Anterior---------------------------------------------------------
+    document.addEventListener("DOMContentLoaded", function () {
+      const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+      // Seleciona o elemento <i> com base no atributo name
+      const el = document.querySelector('i[name="Periodo_Anterior"]');
+      if (el) {
+        const [mesTexto, anoTexto] = el.id.split(" de ");
+        const mesIndex = meses.indexOf(mesTexto);
+
+        let novoMesIndex = mesIndex - 1;
+        let novoAno = parseInt(anoTexto);
+
+        if (novoMesIndex < 0) {
+          novoMesIndex = 11;
+          novoAno -= 1;
+        }
+
+        const mesAnterior = meses[novoMesIndex];
+        const novoTooltip = `Acessa o mês Anterior: ${mesAnterior}/${novoAno}`;
+
+        // Atualiza o atributo data-tooltip do <a> pai
+        const pai = el.closest("a");
+        if (pai) {
+          pai.setAttribute("data-tooltip", novoTooltip);
+        }
+      }
+    });
+
+    
+
+    // Atualiza o botão Posterior----------------------------------------------------------
+    document.addEventListener("DOMContentLoaded", function () {
+      const meses = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+      ];
+      const c_PrxPrdo = "{{slct_PrxPrdo}}";
+
+      // Seleciona o elemento <i> que será usado como referência
+      const el = document.querySelector('i[name="Periodo_Posterior"]');
+      if (!el) return;
+
+      const id = el.id;
+      const pai = el.closest("a");
+
+      if (!pai) return;
+
+      // Verifica se é formato de data (hoje) ou mês (mes)
+
+
+      if (c_PrxPrdo.includes(" às ")) {
+        // Formato: dia "10 de Novembro de 2025 às 00:00"
+
+        //const [diaTexto, mesTexto, anoTexto] = id.split(" de ");
+        const diaTexto = c_PrxPrdo.split(" de ")[0];
+        const mesTexto = meses.find(m => c_PrxPrdo.includes(m));
+
+        // Encontra o mês presente na string
+        const mesEncontrado = meses.find(m => c_PrxPrdo.includes(m));
+
+        let anoTexto = ''; // declara fora
+        if (mesEncontrado) {
+          const partes = c_PrxPrdo.match(/de (\d{4})\s+às/);
+          anoTexto = ''+partes[1]+''; // "2025"
+        }
+
+        const dataAtual = new Date(`${anoTexto}-${mesTexto}-${diaTexto}`);
+
+        // Transforma o dia por extenso
+        const mesNome = meses[parseInt(mesTexto, 10) - 1]; // converte "11" → 10 → "Novembro"
+        const novaData = `${diaTexto} de ${mesTexto} de ${anoTexto}`;
+
+        pai.setAttribute("data-tooltip", `Acessa o dia seguinte: ${novaData}`);
+      }
+      else if (c_PrxPrdo.includes("/")) {
+        // Formato: Mês "Novembro/2025"
+        const c_PrxPrdo = "{{slct_PrxPrdo}}";
+        const [mesTexto, anoTexto] = c_PrxPrdo.split("/");
+        const mesIndex = meses.indexOf(mesTexto);
+        let novoMesIndex = mesIndex + 0;
+        let novoAno = parseInt(anoTexto);
+
+        if (novoMesIndex > 11) {
+          novoMesIndex = 0;
+          novoAno += 1;
+        }
+
+        const mesPosterior = meses[novoMesIndex];
+        const novoTooltip = `Acessa o mês Seguinte: ${mesPosterior}/${novoAno}`;
+        pai.setAttribute("data-tooltip", novoTooltip);
+      }
+      else {
+        // Formato: Ano "2025"
+        const c_PrxPrdo = "{{slct_PrxPrdo}}";
+
+        const anoPosterior = c_PrxPrdo;
+        const novoTooltip = `Acessa o ano Seguinte: ${anoPosterior}`;
+        pai.setAttribute("data-tooltip", novoTooltip);
+      }
+    });
+
+
+  </script>
+  <script>
+
+    let chart = null;
+
+    function renderizarGrafico(dados, periodo) {
+      // Esta localizada em: templates/static/myFunctions.js
+      //                           usa o período recebido
+      const categorias = gerarCategorias(periodo); 
+
+      let formatoTooltip;
+      if (periodo === 'hoje') {
+        formatoTooltip = 'dd/MM/yy HH:mm';
+      } else if (periodo === 'mes') {
+        formatoTooltip = 'dd/MM/yyyy';
+      } else if (periodo === 'ano') {
+        formatoTooltip = 'MMM/yyyy';
+      }      
+
+      // ✅ Remove gráfico anterior e limpa o container
+      if (chart) {
+        chart.destroy();
+      }
+
+      const options = {
+        series: [
+          { name: 'Acessos', data: dados.acessos },
+          { name: 'Clientes', data: dados.cliente },
+          { name: 'Médicos', data: dados.medico },
+          { name: 'Atendentes', data: dados.atendente },
+          { name: 'Gerentes', data: dados.gerente },
+          { name: 'Estagiários', data: dados.estagiario }
+        ],
+
+        chart: { height: 350, type: 'area', toolbar: { show: false } },
+
+        markers: { size: 4 },
+        colors: ['#4154f1', '#2eca6a', '#ff771d', '#00bcd4', '#ffc107', '#9c27b0'],
+        fill: {
+          type: "gradient",
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.3,
+            opacityTo: 0.4,
+            stops: [0, 90, 100]
+          }
+        },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        xaxis: { type: 'datetime', categories: categorias },
+        tooltip: { x: { format: formatoTooltip } }
+      };
+      chart = new ApexCharts(document.querySelector("#reportsChart"), options);
+      chart.render();
+      
+    }
+
+
+    function acssaRltrio(filtro) {
+      const periodo = filtro.toLowerCase();
+
+      if (chart) {
+        chart.destroy(); // remove o gráfico anterior
+        chart.render();
+        document.querySelector("#reportsChart").innerHTML = ""; // limpa o container
+      }
+
+      fetch(`./grafico_dados?filtro=${periodo}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log("Dados recebidos:", data);
+          renderizarGrafico(data, periodo); // passa o período como argumento
+        })
+        .catch(error => {
+          console.error("Erro ao buscar dados:", error);
+        });
+    }
+
+    // Se quizer que reenderiza ao entrar de forma automática
+    document.addEventListener("DOMContentLoaded", () => {
+      acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}");
+    });
+
+  </script>
+
 
 
 {% endblock 'body' %}
 
 
 </html>
+
+

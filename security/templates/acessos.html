@@ -1,0 +1,414 @@
+{% extends "baseSecurity.html" %}
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+
+{% block 'head' %}
+
+  <title>iClynikaX : Security - Acessos</title>
+
+{% endblock 'head' %}
+
+
+
+{% block 'body' %}  
+
+
+  <!-- ======= Sidebar ======= -->
+
+  <main id="main" class="main">
+
+    <div class="pagetitle">
+      <h1>Security</h1>
+      <nav>
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/security/">Security</a></li>
+          <li title="Este mapa permite a detecção em tempo real de anomalias, automatizando respostas a ataques e reduzindo a superfície de exposição. " class="breadcrumb-item active">Acessos - Security Platforms</li>
+        </ol>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <section class="section dashboard">
+      <div class="row">
+
+        <!-- Left side columns -->
+        <div class="col-lg-8">
+          <div class="row">
+
+            <!-- Reports -->
+            <div class="col-12">
+              <div class="card">
+
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filtros</h6>
+                    </li>
+                    <li><a class="dropdown-item" id="Hoje" onClick="acssaRelatorio(this)">Hoje</a></li>
+                    <li><a class="dropdown-item" id="Mes" onClick="acssaRelatorio(this)">Neste Mês</a></li>
+                    <li><a class="dropdown-item" id="Ano" onClick="acssaRelatorio(this)">Neste Ano</a></li>
+                  </ul>
+                </div>
+
+                <div class="card-body">
+                  <h5 class="card-title">Relatórios de acesso de acordo com as atividades <span>| {{slct_Periodo}}</span></h5>
+
+                  <!-- Line Chart -->
+                  <div id="reportsChart"></div> 
+
+                    <script>
+                      document.addEventListener("DOMContentLoaded", () => {
+                        // Gera 24 timestamps para o dia atual
+                        const hoje = new Date();
+                        const ano = hoje.getFullYear();
+                        const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                        const dia = String(hoje.getDate()).padStart(2, '0');
+
+                        const categorias = [];
+                        for (let h = 0; h < 25; h++) {
+                          const hora = String(h).padStart(2, '0');
+                          categorias.push(`${ano}-${mes}-${dia}T${hora}:00:00.000Z`);
+                        }
+
+                        const acessos = {{ slct_Acessos|safe }};
+                        const cliente = {{ slct_Cliente|safe }};
+                        const medico = {{ slct_Medico|safe }};
+                        const atendente = {{ slct_Atendente|safe }};
+                        const gerente = {{ slct_Gerente|safe }};
+                        const estagiario = {{ slct_Estagiario|safe }};
+
+                        new ApexCharts(document.querySelector("#reportsChart"), {
+                          series: [{
+                            name: 'Acessos',
+                            data: acessos,
+                          }, {
+                            name: 'Clientes',
+                            data: cliente
+                          }, {
+                            name: 'Médicos',
+                            data: medico
+                          }, {
+                            name: 'Atendentes',
+                            data: atendente
+                          }, {
+                            name: 'Gerentes',
+                            data: gerente
+                          }, {
+                            name: 'Estagiários',
+                            data: estagiario
+                          }
+                          ],
+                          chart: {
+                            height: 350,
+                            type: 'area',
+                            toolbar: {
+                              show: false
+                            },
+                          },
+                          markers: {
+                            size: 4
+                          },
+                          colors: ['#4154f1', '#2eca6a', '#ff771d', '#00bcd4', '#ffc107', '#9c27b0'],
+                          fill: {
+                            type: "gradient",
+                            gradient: {
+                              shadeIntensity: 1,
+                              opacityFrom: 0.3,
+                              opacityTo: 0.4,
+                              stops: [0, 90, 100]
+                            }
+                          },
+                          dataLabels: {
+                            enabled: false
+                          },
+                          stroke: {
+                            curve: 'smooth',
+                            width: 2
+                          },
+                          xaxis: {
+                            type: 'datetime',
+                            categories: categorias
+                          },
+                          tooltip: {
+                            x: {
+                              format: 'dd/MM/yy HH:mm'
+                            },
+                          }
+                        }).render();
+                      });
+                    </script>
+                  <!-- End Line Chart -->
+
+                </div>
+
+              </div>
+            </div><!-- End Reports -->
+
+            <!-- Acessos Recentes -->
+            <div class="col-12">
+              <div class="card recent-sales overflow-auto">
+
+                <div class="filter">
+                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                    <li class="dropdown-header text-start">
+                      <h6>Filtros</h6>
+                    </li>
+
+                    <!-- Passando parâmetro "filtro" via GET -->
+                    <li><a class="dropdown-item" href="?filtro=hoje">Hoje</a></li>
+                    <li><a class="dropdown-item" href="?filtro=mes">Neste Mês</a></li>
+                    <li><a class="dropdown-item" href="?filtro=ano">Neste Ano</a></li>                    
+
+                  </ul>
+                </div>
+
+                <div class="card-body">
+                  <h5 class="card-title">Registros de Logs<span> | {{slct_Periodo}}</span></h5>
+
+                  <table class="table table-borderless datatable">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Usuário</th>
+                        <th scope="col">Atividade</th>
+                        <th scope="col">Cargo/Atribuição/Função</th>
+                        <th scope="col">Data/Hora</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for Registros_Logs in Rgstrs_Logs  %}
+                        <tr>
+                          <th scope="row"><a href="#">#{{Registros_Logs.id}}</a></th>
+                          <td>{{Registros_Logs.Usuario}}</td>
+                          <td><a href="#" class="text-primary">{{Registros_Logs.Atividade}}</a></td>
+                          <td>{{Registros_Logs.Perfil_User}}</td>
+                          <td><span class="badge bg-success">{{Registros_Logs.DtHr_Atividade|date:"d/m/Y H:i"}}</span></td>
+                        </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+
+                </div>
+
+              </div>
+            </div><!-- End Recent Sales -->
+
+          </div>
+        </div><!-- End Left side columns -->
+
+        <!-- Right side columns -->
+        <div class="col-lg-4">
+
+
+          <!-- Relatório de Atividades -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtros</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Neste Mês</a></li>
+                <li><a class="dropdown-item" href="#">Neste Ano</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Atividades por cidades <span>| {{mesAnoCorrente}}</span></h5>
+
+              <div id="budgetChart" style="min-height: 386px;" class="echart"></div>
+
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                // Defina os nomes das atividades como uma variável global
+                const labels = [
+                  {% for atividade in Rgstrs_Atvddes %}
+                    '{{ atividade.atvddeNome }}'{% if not forloop.last %},{% endif %}
+                  {% endfor %}
+                ];
+
+                var budgetChart = echarts.init(document.querySelector("#budgetChart"));
+                  budgetChart.setOption({
+                    tooltip: {
+                      trigger: 'item',
+                      formatter: function (params) {
+                        let output = `<strong>${params.name}</strong><br/>`;
+                        params.value.forEach((val, idx) => {
+                          output += `${params.marker} ${labels[idx]}: ${val}<br/>`;
+                        });
+                        return output;
+                      }
+                    },
+                      legend: {
+                      data: [
+                            {% for cidade in Rgstrs_Cddes %}
+                              '{{ cidade }}'{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                          ]
+                        },
+                    radar: {
+                      // shape: 'circle',
+                        indicator: [
+                          {% for atividade in Rgstrs_Atvddes %}
+                          {
+                            name: '{{ atividade.atvddeNome }}',
+                            max: {{Rgstrs_MaxAtvddes}}
+                          }{% if not forloop.last %},{% endif %}
+                          {% endfor %}
+                        ]
+                      },
+                    series: [{
+                      name: 'Budget vs spending',
+                      type: 'radar',
+                      data: [
+                        {% for cidade in Rgstrs_Series %}
+                        {
+                          value: [
+                            {% for valor in cidade.value %}
+                              {{ valor }}{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                          ],
+                          name: '{{ cidade.name }}'
+                        }{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                      ]                            
+                    }]
+                  });
+                });
+              </script>
+
+            </div>
+          </div><!-- Final do Relatório de Atividades -->
+
+          <!-- Assinaturas Atividades -->
+          <div class="card">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Filtros</h6>
+                </li>
+
+                <li><a class="dropdown-item" href="#">Hoje</a></li>
+                <li><a class="dropdown-item" href="#">Neste Mês</a></li>
+                <li><a class="dropdown-item" href="#">Neste Ano</a></li>
+              </ul>
+            </div>
+
+            <div class="card-body pb-0">
+              <h5 class="card-title">Assinaturas das Atividades <span>| {{mesAnoCorrente}}</span></h5>
+                  <div id="trafficChart" style="min-height: 552px;" class="echart"></div>
+              <script>
+                document.addEventListener("DOMContentLoaded", () => {
+                  echarts.init(document.querySelector("#trafficChart")).setOption({
+                    tooltip: {
+                      trigger: 'item'
+                    },
+                    legend: {
+                      top: '0%',
+                      left: 'center'
+                    },
+                    series: [{
+                      top: '25%',
+                      name: 'Assinados:',
+                      type: 'pie',
+                      radius: ['40%', '85%'],
+                      avoidLabelOverlap: false,
+                      label: {
+                        show: false,
+                        position: 'center'
+                      },
+                      emphasis: {
+                        label: {
+                          show: true,
+                          fontSize: '18',
+                          fontWeight: 'bold'
+                        }
+                      },
+                      labelLine: {
+                        show: false
+                      },
+                      data: [
+                        {% for Atividade in Rgstrs_Atvddes %}
+                          {
+                            value: {{ Atividade.atvddeValor }},
+                            name: '{{ Atividade.atvddeNome }}'
+                          }
+                          {% if not forloop.last %},{% endif %}
+                        {% endfor %},
+                      ]
+                    }]
+                  });
+                });
+              </script>
+
+            </div>
+          </div>
+          <!-- Finalização: Assinaturas Atividades -->
+
+
+
+
+        </div><!-- End Right side columns -->
+
+      </div>
+    </section>
+
+  </main><!-- End #main -->
+
+    <!--Ativa as opções do menu principal esquerdo -->
+    <script language="JavaScript">
+		<!--
+            document.getElementById('security-nav').className ='nav-content collapse show';
+            document.getElementById('sidebar-nav-security-mapa').className ='active';
+         
+		//-->
+	  </script>
+
+<script>
+  function acessaRelatorio(elemento) {
+    const filtro = elemento.id;
+
+    fetch('/relatorio/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': getCookie('csrftoken')  // importante para segurança
+      },
+      body: JSON.stringify({ filtro: filtro })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Aqui você pode atualizar a página com os dados recebidos
+      console.log(data);
+      // Exemplo: document.getElementById("resultado").innerHTML = data.html;
+    });
+  }
+
+  // Função para pegar o CSRF token do cookie
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
+
+
+{% endblock 'body' %}
+
+
+</html>
