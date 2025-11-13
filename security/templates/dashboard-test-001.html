@@ -7,14 +7,13 @@
 
   iClynikaX : Security - Dashboard
 
-{% endblock 'title' %}
-
-
-{% block 'body' %}  
-
   <!-- Functions geral de javascripts -->
   <script src="{% static 'geral/js/myFunctions.js' %}?v={% now 'YmdHis' %}"></script>
 
+
+{% endblock 'title' %}
+
+{% block 'body' %}  
 
   <!-- ======= Sidebar ======= -->
 
@@ -26,7 +25,7 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
           <li class="breadcrumb-item"><a href="/security/">Security</a></li>
-          <li class="breadcrumb-item active" title='Este mapa permite a detecção em tempo real de anomalias, automatizando respostas a ataques e reduzindo a superfície de exposição. '>Mapa Geral - Security Platforms</li>
+          <li title="Este mapa permite a detecção em tempo real de anomalias, automatizando respostas a ataques e reduzindo a superfície de exposição. " class="breadcrumb-item active">Mapa Geral - Security Platforms</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -165,16 +164,11 @@
                         const mes = String(hoje.getMonth() + 1).padStart(2, '0');
                         const dia = String(hoje.getDate()).padStart(2, '0');
 
-                        const categorias = gerarCategorias(periodo); 
-
-                        let formatoTooltip;
-                        if (slct_Filtro === 'hoje') {
-                          formatoTooltip = 'dd/MM/yy HH:mm';
-                        } else if (slct_Filtro === 'mes') {
-                          formatoTooltip = 'dd/MM/yyyy';
-                        } else if (slct_Filtro === 'ano') {
-                          formatoTooltip = 'MMM/yyyy';
-                        }      
+                        const categorias = [];
+                        for (let h = 0; h < 25; h++) {
+                          const hora = String(h).padStart(2, '0');
+                          categorias.push(`${ano}-${mes}-${dia}T${hora}:00:00.000Z`);
+                        }
 
                         const acessos = {{ slct_Acessos|safe }};
                         const cliente = {{ slct_Cliente|safe }};
@@ -235,9 +229,13 @@
                             type: 'datetime',
                             categories: categorias
                           },
-                          tooltip: { x: { format: formatoTooltip } }
+                          tooltip: {
+                            x: {
+                              format: 'dd/MM/yy HH:mm'
+                            },
+                          }
                         })
-                        //.render();
+                        .render();
                       });
                     </script>
                   <!-- End Line Chart -->
@@ -561,11 +559,12 @@
       return cookieValue;
     }
 
-    // -----------------------------------------------------------------------------------------------------------------------------------------------------
-    // Atualiza o botão para acesso a data anterior
+    
     function acssaPrdoAntror(obj){
       const el = document.querySelector('i[name="Periodo_Anterior"]');
       if (!el) return;
+      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
+      const c_CrrntePrdo = `${slct_PrePeriodo} às 00:00`;
 
       const pai = el.closest("a");
       if (!pai) return;
@@ -576,98 +575,51 @@
       const paiPstrior = dcmntPstrior.closest("a");
       if (!paiPstrior) return;
 
-      // Pega o valor que esta na data em que pertence o gráfico abaixo.
       const txtPstrior = document.getElementById('data-relatorio').textContent;
-      paiPstrior.setAttribute("data-tooltip", `Acessa o dia seguinte: ${txtPstrior}`);
-      dcmntPstrior.setAttribute("id", `${txtPstrior}`);
-
-      // Atualiza a data atual do relatório abaixo
-      // Atualiza o valor do conteúdo do gráfico abaixo.
-      document.getElementById('data-relatorio').textContent = el.id ;
-
-      //alert('587. el.id: '+el.id);
-
-      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
-      const dtISOPre = converterDataExtensoParaISO(slct_PrePeriodo); //Esta no Functions geral de javascripts ..'geral/js/myFunctions.js'
-      const dtISO = new Date(dtISOPre + "T00:00:00");
-      if (typeof dtISO === "string") {
-        dtISO = new Date(dtISO);
-      }
-      const dt_De = new Date(dtISOPre + "T00:00:00");
-
-      // alert('597.dt_De: '+dt_De)
-
-      // Tue Nov 11 2025 04:24:20 GMT-0300
-      // const c_CrrntePrdo = new Date(dtISOPre + "T00:00:00");
-
-      const dtCrrntePrdo = `${slct_PrePeriodo} às 00:00`;
-
-      // Retorna: dtPrdoAtlzado: 2025-11-10
-      const dtPrdoAtlzado = atualizarTooltipPeriodo(dtCrrntePrdo, el, -1);
-      // alert('586; dtPrdoAtlzado: '+dtPrdoAtlzado);
-
-      acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}", dt_De, dt_De);
-
+      paiPstrior.setAttribute("data-tooltip", txtPstrior);
       
+      document.getElementById('data-relatorio').textContent = el.id ;
+      atualizarTooltipPeriodo(c_CrrntePrdo, el, -1);
+
+      // alert('Refresh o gráfico abaixo.')
+
+      //renderizarGrafico('hoje', periodo); // passa o período como argumento
+     
 
     }
 
 
-    //---------------------------------------------------------------------------------------------------- Ao Clickar o botão Posterior 
-    //----------------------------------------------------------------------------------------------------
+
+
     function acssaPrdoPstror(obj){
       const el = document.querySelector('i[name="Periodo_Posterior"]');
       if (!el) return;
+      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
+      const c_CrrntePrdo = `${slct_PrePeriodo} às 00:00`;
 
       const pai = el.closest("a");
       if (!pai) return;
 
-      // alert('el.id:'+el.id);
-
-      const dcmntAntrior = document.querySelector('i[name="Periodo_Anterior"]');
-      if (!dcmntAntrior) return;
+      const dcmntPstrior = document.querySelector('i[name="Periodo_Anterior"]');
+      if (!dcmntPstrior) return;
       
-      const paiAntrior = dcmntAntrior.closest("a");
-      if (!paiAntrior) return;
+      const paiPstrior = dcmntPstrior.closest("a");
+      if (!paiPstrior) return;
 
-      // Pega o valor que esta na data em que pertence o gráfico abaixo.
       const txtPstrior = document.getElementById('data-relatorio').textContent;
-      paiAntrior.setAttribute("data-tooltip", `Acessa o dia anterior: ${txtPstrior}`);
-      dcmntAntrior.setAttribute("id", `${txtPstrior}`);
-      alert('dcmntAntrior: '+dcmntAntrior.id);
-
-      // Atualiza a data atual do relatório abaixo
-      // Atualiza o valor do conteúdo do gráfico abaixo.
+      paiPstrior.setAttribute("data-tooltip", txtPstrior);
+      
       document.getElementById('data-relatorio').textContent = el.id ;
+      atualizarTooltipPeriodo(c_CrrntePrdo, el, +1);
 
-      // alert('587. el.id: '+el.id);
+      // alert('Refresh o gráfico abaixo.')
 
-      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
-      const dtISOPre = converterDataExtensoParaISO(slct_PrePeriodo); //Esta no Functions geral de javascripts ..'geral/js/myFunctions.js'
-      const dtISO = new Date(dtISOPre + "T00:00:00");
-      if (typeof dtISO === "string") {
-        dtISO = new Date(dtISO);
-      }
-      const dt_De = new Date(dtISOPre + "T00:00:00");
-
-      // alert('597.dt_De: '+dt_De)
-
-      // Tue Nov 11 2025 04:24:20 GMT-0300
-      // const c_CrrntePrdo = new Date(dtISOPre + "T00:00:00");
-
-      const dtCrrntePrdo = `${slct_PrePeriodo} às 00:00`;
-
-      // Retorna: dtPrdoAtlzado: 2025-11-10
-      const dtPrdoAtlzado = atualizarTooltipPeriodo(dtCrrntePrdo, el, +1);
-      // alert('586; dtPrdoAtlzado: '+dtPrdoAtlzado);
-
-      acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}", dt_De, dt_De);
-
-
+      //renderizarGrafico('hoje', periodo); // passa o período como argumento
+       
     }
 
     //----------------------------------------------------------------------------------- Atualiza os valores de Title dos botões de relatórios
-    // Atualiza o botão Anterior ao acessar essa página .html----------------------------
+    // Atualiza o botão Anterior---------------------------------------------------------
     document.addEventListener("DOMContentLoaded", function () {
       const el = document.querySelector('i[name="Periodo_Anterior"]');
       if (!el) return;
@@ -676,10 +628,10 @@
 
       const pai = el.closest("a");
       if (!pai) return;
-      // Retorna: dtPrdoAtlzado: 2025-11-10
-      const dtPrdoAtlzado = atualizarTooltipPeriodo(c_CrrntePrdo, el, -1);
-      // alert('657. dtPrdoAtlzado:'+dtPrdoAtlzado)
-    
+      
+      atualizarTooltipPeriodo(c_CrrntePrdo, el, -1);
+
+
     });
 
 
@@ -696,49 +648,42 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
   if (c_PreCrrntePrdo.includes(" às ")) {
 
     const entrada = c_PreCrrntePrdo;
-   
+
     // Extrai partes da data
     const partes = entrada.split(" de ");
     const dia = partes[0].padStart(2, '0'); // "09"
+    // alert(dia);
     const mesNome = partes[1];
     const ano = partes[2].split(" às ")[0];
 
-    const mesIndex = meses.indexOf(mesNome) ;
+    const mesIndex = meses.indexOf(mesNome) + 1;
     const mes = String(mesIndex).padStart(2, '0'); // "11"
     // alert('mes: '+mes);
 
-    const dataAtual = new Date(ano, mes, dia); // cria no fuso local
-    // alert('692. dataAtual: '+dataAtual); // dataAtual: Tue Nov 11 2025 00:00:00 GMT-0300 (Horário Padrão de Brasília)
+    const c_CrrntePrdo = `${ano}-${(mes-1)}-${dia}`;  
+
+    // alert('c_CrrntePrdo: '+c_CrrntePrdo);
+
+    const dataAtual = new Date(ano, (mes-1), dia); // cria no fuso local
     
-    // alert('nAjstePrdo: '+nAjstePrdo)
+    // alert('dataAtualAnterior:'+dataAtual);
+
+
     dataAtual.setDate(dataAtual.getDate() + nAjstePrdo); // 👈 subtrai ou soma
 
-    // alert('696. dataAtual: '+dataAtual); // dataAtual: Mon Nov 10 2025 00:00:00 GMT-0300 (Horário Padrão de Brasília)
+    // alert('dataAtual: '+dataAtual);
 
     const diaNovo = dataAtual.getDate();
     const mesNovo = meses[dataAtual.getMonth()];
     const anoNovo = dataAtual.getFullYear();
 
-    // Atualiza ao colocar o mouse, no campo que se refere ao clickar no anteriror..
     const novaData = `${diaNovo} de ${mesNovo} de ${ano}`;
-
     const direcao = nAjstePrdo < 0 ? "anterior" : nAjstePrdo > 0 ? "posterior" : "atual";
     pai.setAttribute("data-tooltip", `Acessa o dia ${direcao}: ${novaData}`);
 
-    //  alert('706. el.id: '+el.id);
-    // Atualiza o id com a data anterior atualizada.
+    // alert('1. el.id:'+el.id);
     el.setAttribute("id", `${diaNovo} de ${mesNovo} de ${ano}`);
-    // alert('708. el.id: '+el.id);
-
-
-
-    const diaFormatado = String(dataAtual.getDate()).padStart(2, '0');
-    const mesFormatado = String(dataAtual.getMonth() + 1).padStart(2, '0');
-    const anoFormatado = dataAtual.getFullYear();
-
-    // Retorna a data no formato? 2025-11-30  
-    return `${anoFormatado}-${mesFormatado}-${diaFormatado}`;
-
+    // alert('2. el.id:'+el.id);
 
   }
 
@@ -770,7 +715,7 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
 }
 
 
-    // Atualiza o botão Posterior de forma automática ao entrar na página---------------------------------------------------
+    // Atualiza o botão Posterior----------------------------------------------------------
     document.addEventListener("DOMContentLoaded", function () {
       const meses = [
         "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -845,18 +790,12 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
   </script>
   <script>
 
-    // ----------------------------------------------------------------------------------------------------------------------------------------
     let chart = null;
-    function renderizarGrafico(dados, periodo, dtDe_ = new Date(), dtA_ = new Date() ) {
 
-      dtDe_Slct = dtA_;
-      dtA_Slct = dtA_;
-
-    //  alert('836. [renderizarGrafico] dtDe_Slct: '+dtDe_Slct);  // 836. [renderizarGrafico] dtDe_Slct: 2025-11-12
-    //  alert('837. [renderizarGrafico] dtA_Slct: '+dtA_Slct);    // 837. [renderizarGrafico] dtA_Slct: 2025-11-12   Deveria ser mais um dia
-      
-
-      const categorias = gerarCategorias(periodo, dtDe_Slct ); 
+    function renderizarGrafico(dados, periodo) {
+      // Esta localizada em: templates/static/myFunctions.js
+      //                           usa o período recebido
+      const categorias = gerarCategorias(periodo); 
 
       let formatoTooltip;
       if (periodo === 'hoje') {
@@ -897,80 +836,35 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
         },
         dataLabels: { enabled: false },
         stroke: { curve: 'smooth', width: 2 },
-        xaxis: { type: 'datetime',
-        categories: categorias },
+        xaxis: { type: 'datetime', categories: categorias },
         tooltip: { x: { format: formatoTooltip } }
       };
       chart = new ApexCharts(document.querySelector("#reportsChart"), options);
       chart.render();
-    }
-    // --------------------------------------------------------------------------------------------------------
-    function formatarDataISO(data) {
-      if (!(data instanceof Date)) {
-        data = new Date(data); // aceita string ou timestamp também
-      }
-
-      const ano = data.getFullYear();
-      const mes = String(data.getMonth() + 1).padStart(2, '0'); // mês zero-based
-      const dia = String(data.getDate()).padStart(2, '0');
-
-      return `${ano}-${mes}-${dia}`;
-    }
-    // --------------------------------------------------------------------------------------------------------
-
-    function acssaRltrio(filtro, dtDe_Rfrncia = new Date(), dtA_Rfrncia = new Date()) {
-      const slct_filtro = filtro.toLowerCase();
-
-      if (typeof dtDe_Rfrncia === "string") {
-        dtDe_Rfrncia = new Date(dtDe_Rfrncia);
-      }
-
-      // Se dtA_Rfrncia não foi passado, define como dtDe_Rfrncia + 1 dia
-      if (!dtA_Rfrncia) {
-        dtA_Rfrncia = new Date(dtDe_Rfrncia);
-        dtA_Rfrncia.setDate(dtA_Rfrncia.getDate() + 1);
-      } else {
-        if (typeof dtA_Rfrncia === "string") {
-          dtA_Rfrncia = new Date(dtA_Rfrncia);
-        }
-      }
-
-      // alert('918.[acssaRltrio] dtDe_Rfrncia:'+dtDe_Rfrncia); // 918.[acssaRltrio] dtDe_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
-      // alert('919.[acssaRltrio] dtA_Rfrncia:'+dtA_Rfrncia);   // 919.[acssaRltrio] dtA_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
-
-      // Ao Clickar anterior, essas acima ficam................:918.[acssaRltrio] dtDe_Rfrncia:Sun Nov 09 2025 21:00:00 GMT-0300 (Horário Padrão de Brasília)
-      //                                                        919.[acssaRltrio] dtA_Rfrncia:Wed Nov 12 2025 20:29:51 GMT-0300 (Horário Padrão de Brasília)
-
-
-      //const dtDe_ = dtDe_Rfrncia.toISOString().split('T')[0]; // formato: YYYY-MM-DD - dtDe_:2025-11-12 problemas com o fuso horário
-      const dtDe_ = formatarDataISO(dtDe_Rfrncia);
-
-
-      // alert('920.[acssaRltrio] dtA_Rfrncia:'+dtA_Rfrncia) 
-
-      const dtA_ =  formatarDataISO(dtA_Rfrncia);      // formato: YYYY-MM-DD
-
-      //alert('924.[acssaRltrio] dtA_: '+dtA_)   // 910.[acssaRltrio] dtDe_: 2025-11-12
       
+    }
+
+
+    function acssaRltrio(filtro) {
+      const periodo = filtro.toLowerCase();
+
       if (chart) {
         chart.destroy(); // remove o gráfico anterior
         chart.render();
         document.querySelector("#reportsChart").innerHTML = ""; // limpa o container
       }
 
-      fetch(`../grafico_dados?filtro=${slct_filtro}&dt_De=${dtDe_}&dt_A=${dtA_}`)
+      fetch(`./grafico_dados?filtro=${periodo}`)
         .then(response => response.json())
         .then(data => {
           console.log("Dados recebidos:", data);
-          renderizarGrafico(data, slct_filtro, dtDe_, dtA_); // passa o período como argumento
+          renderizarGrafico(data, periodo); // passa o período como argumento
         })
         .catch(error => {
           console.error("Erro ao buscar dados:", error);
         });
     }
-//---------------------------------------------------------------------------------------------------------------------
-//
-//---------------------------------------------------------------------------------------------------------------------
+
     // Se quizer que reenderiza ao entrar de forma automática
     document.addEventListener("DOMContentLoaded", () => {
       acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}");

@@ -116,8 +116,6 @@ def fnct_scrty_test(request):
         else:
             anterior_mes = date(hoje.year, hoje.month - 1, 1)
 
-
-
         # Último dia do mês
         if hoje.month == 12:
             proximo_mes = date(hoje.year + 1, 1, 1)
@@ -1139,7 +1137,6 @@ def fnct_scrty_acessos(request):
 # =======================================================================================================
 # Atualiza o gráfico de Relatórios
 def gerar_dados(request):
-
     if request.method == "GET":
         filtro = request.GET.get('filtro', 'hoje').lower()
     elif request.method == "POST":
@@ -1147,7 +1144,15 @@ def gerar_dados(request):
     else:
         filtro = 'hoje'
 
-    hoje = datetime.now().date()
+    slct_dt = datetime.now().date()
+    if request.method == "GET":
+        slct_dt_D = request.GET.get('dt_De', slct_dt)
+        slct_dt_A = request.GET.get('dt_A', 'hoje')
+    elif request.method == "POST":
+        slct_dt_D = request.POST.get('dt_De', slct_dt)
+        slct_dt_A = request.POST.get('dt_A', 'hoje')
+
+    hoje = slct_dt_D
 
     mes_extenso = hoje.strftime('%B').capitalize()  # exemplo: 'Setembro'
     mesAnoCrrnte = f"{mes_extenso}"
@@ -1389,7 +1394,6 @@ def gerar_dados(request):
             .values('hora')
             .annotate(total=Count('id'))
         )
-
         for item in acessos_por_hora:
             if item['hora'] is not None:
                 hora = item['hora'].hour
@@ -1403,12 +1407,57 @@ def gerar_dados(request):
             .values('hora')
             .annotate(total=Count('id'))
         )
-
         for item in cliente_por_hora:
             if item['hora'] is not None:
                 hora = item['hora'].hour
                 cliente[hora] = item['total']
 
+        medico_por_hora = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Médico')
+            .annotate(hora=TruncHour('DtHr_Atividade'))
+            .values('hora')
+            .annotate(total=Count('id'))
+        )
+        for item in medico_por_hora:
+            hora = item['hora'].hour
+            medico[hora] = item['total']
+
+        atendente_por_hora = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Atendente')
+            .annotate(hora=TruncHour('DtHr_Atividade'))
+            .values('hora')
+            .annotate(total=Count('id'))
+        )
+        for item in atendente_por_hora:
+            hora = item['hora'].hour
+            atendente[hora] = item['total']
+
+        gerente_por_hora = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Gerente')
+            .annotate(hora=TruncHour('DtHr_Atividade', output_field=DateTimeField(), tzinfo=None))
+            .values('hora')
+            .annotate(total=Count('id'))
+        )
+        for item in gerente_por_hora:
+            hora = item['hora'].hour
+            gerente[hora] = item['total']
+
+        estagiario_por_hora = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Estagiário')
+            .annotate(hora=TruncHour('DtHr_Atividade'))
+            .values('hora')
+            .annotate(total=Count('id'))
+        )
+        for item in estagiario_por_hora:
+            hora = item['hora'].hour
+            estagiario[hora] = item['total']
+
+    # ----------------------------------------------------------------------------------------------Finaliza Dia
+    # Se filtro for igual "Mês"--------------------------------------------------------------------------------
     if filtro == 'mes':
         # Para MÊS: acessos por dia
         acessos_por_dia = (
@@ -1424,6 +1473,64 @@ def gerar_dados(request):
                 dia = item['dia'].day
                 acessos[dia - 1] = item['total']  # índice começa em 0
 
+        # Para perfis específicos (Cliente, Médico etc.)
+        cliente_por_dia = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Cliente')
+            .annotate(dia=TruncDay('DtHr_Atividade'))
+            .values('dia')
+            .annotate(total=Count('id'))
+        )
+        for item in cliente_por_dia:
+            dia = item['dia'].day
+            cliente[dia - 1] = item['total']
+
+        medico_por_dia = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Médico')
+            .annotate(dia=TruncDay('DtHr_Atividade'))
+            .values('dia')
+            .annotate(total=Count('id'))
+        )
+        for item in medico_por_dia:
+            dia = item['dia'].day
+            medico[dia] = item['total']
+
+        atendente_por_dia = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Atendente')
+            .annotate(dia=TruncDay('DtHr_Atividade'))
+            .values('dia')
+            .annotate(total=Count('id'))
+        )
+        for item in atendente_por_dia:
+            dia = item['dia'].day
+            atendente[dia] = item['total']
+
+        gerente_por_dia = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Gerente')
+            .annotate(dia=TruncDay('DtHr_Atividade', output_field=DateTimeField(), tzinfo=None))
+            .values('dia')
+            .annotate(total=Count('id'))
+        )
+        for item in gerente_por_dia:
+            dia = item['dia'].day
+            gerente[dia] = item['total']
+
+        estagiario_por_dia = (
+            Security_Logs.objects
+            .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Estagiário')
+            .annotate(dia=TruncDay('DtHr_Atividade'))
+            .values('dia')
+            .annotate(total=Count('id'))
+        )
+        for item in estagiario_por_dia:
+            dia = item['dia'].day
+            estagiario[dia] = item['total']
+
+    # ----------------------------------------------------------------------------------------------Finaliza Mes
+    # Se filtro for igual "Anoa"--------------------------------------------------------------------------------
     if filtro == 'ano':
         acessos_por_mes = (
             Security_Logs.objects
@@ -1438,18 +1545,6 @@ def gerar_dados(request):
                 mes = item['mes'].month
                 acessos[mes - 1] = item['total']
 
-    # Para perfis específicos (Cliente, Médico etc.)
-    cliente_por_dia = (
-        Security_Logs.objects
-        .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Cliente')
-        .annotate(dia=TruncDay('DtHr_Atividade'))
-        .values('dia')
-        .annotate(total=Count('id'))
-    )
-    for item in cliente_por_dia:
-        dia = item['dia'].day
-        cliente[dia - 1] = item['total']
-
     # Exemplo: filtrando por tipo de atividade
     usuarios_por_hora = (
         Security_Logs.objects
@@ -1461,51 +1556,6 @@ def gerar_dados(request):
     for item in usuarios_por_hora:
         hora = item['hora'].hour
         usuarios[hora] = item['total']
-
-    medico_por_hora = (
-        Security_Logs.objects
-        .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Médico')
-        .annotate(hora=TruncHour('DtHr_Atividade'))
-        .values('hora')
-        .annotate(total=Count('id'))
-    )
-    for item in medico_por_hora:
-        hora = item['hora'].hour
-        medico[hora] = item['total']
-
-    estagiario_por_hora = (
-        Security_Logs.objects
-        .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Estagiário')
-        .annotate(hora=TruncHour('DtHr_Atividade'))
-        .values('hora')
-        .annotate(total=Count('id'))
-    )
-    for item in estagiario_por_hora:
-        hora = item['hora'].hour
-        estagiario[hora] = item['total']
-
-    gerente_por_hora = (
-        Security_Logs.objects
-        .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Gerente')
-        .annotate(hora=TruncHour('DtHr_Atividade', output_field=DateTimeField(), tzinfo=None))
-        .values('hora')
-        .annotate(total=Count('id'))
-    )
-
-    for item in gerente_por_hora:
-        hora = item['hora'].hour
-        gerente[hora] = item['total']
-
-    atendente_por_hora = (
-        Security_Logs.objects
-        .filter(DtHr_Atividade__range=(data_inicio, data_fim), Perfil_User='Atendente')
-        .annotate(hora=TruncHour('DtHr_Atividade'))
-        .values('hora')
-        .annotate(total=Count('id'))
-    )
-    for item in atendente_por_hora:
-        hora = item['hora'].hour
-        atendente[hora] = item['total']
 
     # ----------------------------------------------------
 
@@ -1611,9 +1661,43 @@ def gerar_dados(request):
 
 
 def grafico_dados(request):
+    hoje = datetime.now().date()
     if request.method == 'GET':
         periodo = request.GET.get('filtro', 'hoje').lower()
+
+        # Captura dt_De
+        dt_De_str = request.GET.get('dt_De')
+        try:
+            dt_De = datetime.strptime(
+                dt_De_str, '%Y-%m-%d').date() if dt_De_str else hoje
+        except ValueError:
+            dt_De = hoje
+
+        # Captura dt_A, ou define como dt_De + 1 dia
+        dt_A_str = request.GET.get('dt_A')
+        try:
+            dt_A = datetime.strptime(
+                dt_A_str, '%Y-%m-%d').date() if dt_A_str else dt_De + timedelta(days=1)
+        except ValueError:
+            dt_A = dt_De + timedelta(days=1)
+
     elif request.method == 'POST':
+        # Captura dt_De
+        dt_De_str = request.GET.get('dt_De')
+        try:
+            dt_De = datetime.strptime(
+                dt_De_str, '%Y-%m-%d').date() if dt_De_str else hoje
+        except ValueError:
+            dt_De = hoje
+
+        # Captura dt_A, ou define como dt_De + 1 dia
+        dt_A_str = request.GET.get('dt_A')
+        try:
+            dt_A = datetime.strptime(
+                dt_A_str, '%Y-%m-%d').date() if dt_A_str else dt_De + timedelta(days=1)
+        except ValueError:
+            dt_A = dt_De + timedelta(days=1)
+
         try:
             periodo = request.POST.get('filtro', 'hoje').lower()
         except Exception as e:
@@ -1625,6 +1709,8 @@ def grafico_dados(request):
     # Adiciona o parâmetro 'filtro' à request para que gerar_dados use
     request.GET = request.GET.copy()
     request.GET['filtro'] = periodo
+    request.GET['dt_De'] = dt_De
+    request.GET['dt_A'] = dt_A
 
     dados = gerar_dados(request)
     return JsonResponse(dados)

@@ -26,7 +26,7 @@
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="/">Home</a></li>
           <li class="breadcrumb-item"><a href="/security/">Security</a></li>
-          <li class="breadcrumb-item active" title='Este mapa permite a detecção em tempo real de anomalias, automatizando respostas a ataques e reduzindo a superfície de exposição. '>Mapa Geral - Security Platforms</li>
+          <li title="Este mapa permite a detecção em tempo real de anomalias, automatizando respostas a ataques e reduzindo a superfície de exposição. " class="breadcrumb-item active">Mapa Geral - Security Platforms</li>
         </ol>
       </nav>
     </div><!-- End Page Title -->
@@ -578,8 +578,7 @@
 
       // Pega o valor que esta na data em que pertence o gráfico abaixo.
       const txtPstrior = document.getElementById('data-relatorio').textContent;
-      paiPstrior.setAttribute("data-tooltip", `Acessa o dia seguinte: ${txtPstrior}`);
-      dcmntPstrior.setAttribute("id", `${txtPstrior}`);
+      paiPstrior.setAttribute("data-tooltip", `Acessa o dia seguinte :${txtPstrior}`);
 
       // Atualiza a data atual do relatório abaixo
       // Atualiza o valor do conteúdo do gráfico abaixo.
@@ -595,7 +594,7 @@
       }
       const dt_De = new Date(dtISOPre + "T00:00:00");
 
-      // alert('597.dt_De: '+dt_De)
+      alert('597.dt_De: '+dt_De)
 
       // Tue Nov 11 2025 04:24:20 GMT-0300
       // const c_CrrntePrdo = new Date(dtISOPre + "T00:00:00");
@@ -618,51 +617,35 @@
     function acssaPrdoPstror(obj){
       const el = document.querySelector('i[name="Periodo_Posterior"]');
       if (!el) return;
+      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
+      const c_CrrntePrdo = `${slct_PrePeriodo} às 00:00`;
 
       const pai = el.closest("a");
       if (!pai) return;
 
-      // alert('el.id:'+el.id);
-
-      const dcmntAntrior = document.querySelector('i[name="Periodo_Anterior"]');
-      if (!dcmntAntrior) return;
+      const dcmntPstrior = document.querySelector('i[name="Periodo_Anterior"]');
+      if (!dcmntPstrior) return;
       
-      const paiAntrior = dcmntAntrior.closest("a");
-      if (!paiAntrior) return;
+      const paiPstrior = dcmntPstrior.closest("a");
+      if (!paiPstrior) return;
 
-      // Pega o valor que esta na data em que pertence o gráfico abaixo.
       const txtPstrior = document.getElementById('data-relatorio').textContent;
-      paiAntrior.setAttribute("data-tooltip", `Acessa o dia anterior: ${txtPstrior}`);
-      dcmntAntrior.setAttribute("id", `${txtPstrior}`);
-      alert('dcmntAntrior: '+dcmntAntrior.id);
-
-      // Atualiza a data atual do relatório abaixo
-      // Atualiza o valor do conteúdo do gráfico abaixo.
+      paiPstrior.setAttribute("data-tooltip", txtPstrior);
+      
       document.getElementById('data-relatorio').textContent = el.id ;
 
-      // alert('587. el.id: '+el.id);
 
-      const slct_PrePeriodo = el.id; // ou pegue de algum elemento
-      const dtISOPre = converterDataExtensoParaISO(slct_PrePeriodo); //Esta no Functions geral de javascripts ..'geral/js/myFunctions.js'
-      const dtISO = new Date(dtISOPre + "T00:00:00");
-      if (typeof dtISO === "string") {
-        dtISO = new Date(dtISO);
-      }
-      const dt_De = new Date(dtISOPre + "T00:00:00");
+      const dt_De = atualizarTooltipPeriodo(c_CrrntePrdo, el, +1);
+      //alert('dt_De: '+dt_De);
 
-      // alert('597.dt_De: '+dt_De)
+      // alert('Refresh o gráfico abaixo.')
+      //alert('c_CrrntePrdo: '+c_CrrntePrdo);
 
-      // Tue Nov 11 2025 04:24:20 GMT-0300
-      // const c_CrrntePrdo = new Date(dtISOPre + "T00:00:00");
+      acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}", dt_De);
+      // const dt_De = new Date("2025-11-10");
+      // acssaRltrio("hoje", dt_De);
 
-      const dtCrrntePrdo = `${slct_PrePeriodo} às 00:00`;
-
-      // Retorna: dtPrdoAtlzado: 2025-11-10
-      const dtPrdoAtlzado = atualizarTooltipPeriodo(dtCrrntePrdo, el, +1);
-      // alert('586; dtPrdoAtlzado: '+dtPrdoAtlzado);
-
-      acssaRltrio("{{ slct_Filtro|default:'hoje'|escapejs }}", dt_De, dt_De);
-
+      // alert('Refresh o gráfico acima.')
 
     }
 
@@ -697,6 +680,7 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
 
     const entrada = c_PreCrrntePrdo;
    
+
     // Extrai partes da data
     const partes = entrada.split(" de ");
     const dia = partes[0].padStart(2, '0'); // "09"
@@ -725,12 +709,10 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
     const direcao = nAjstePrdo < 0 ? "anterior" : nAjstePrdo > 0 ? "posterior" : "atual";
     pai.setAttribute("data-tooltip", `Acessa o dia ${direcao}: ${novaData}`);
 
-    //  alert('706. el.id: '+el.id);
+   //  alert('706. el.id: '+el.id);
     // Atualiza o id com a data anterior atualizada.
     el.setAttribute("id", `${diaNovo} de ${mesNovo} de ${ano}`);
     // alert('708. el.id: '+el.id);
-
-
 
     const diaFormatado = String(dataAtual.getDate()).padStart(2, '0');
     const mesFormatado = String(dataAtual.getMonth() + 1).padStart(2, '0');
@@ -935,8 +917,8 @@ function atualizarTooltipPeriodo(c_PreCrrntePrdo, el, nAjstePrdo = -1) {
         }
       }
 
-      // alert('918.[acssaRltrio] dtDe_Rfrncia:'+dtDe_Rfrncia); // 918.[acssaRltrio] dtDe_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
-      // alert('919.[acssaRltrio] dtA_Rfrncia:'+dtA_Rfrncia);   // 919.[acssaRltrio] dtA_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
+      alert('918.[acssaRltrio] dtDe_Rfrncia:'+dtDe_Rfrncia); // 918.[acssaRltrio] dtDe_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
+      alert('919.[acssaRltrio] dtA_Rfrncia:'+dtA_Rfrncia);   // 919.[acssaRltrio] dtA_Rfrncia:Wed Nov 12 2025 20:28:14 GMT-0300 (Horário Padrão de Brasília)
 
       // Ao Clickar anterior, essas acima ficam................:918.[acssaRltrio] dtDe_Rfrncia:Sun Nov 09 2025 21:00:00 GMT-0300 (Horário Padrão de Brasília)
       //                                                        919.[acssaRltrio] dtA_Rfrncia:Wed Nov 12 2025 20:29:51 GMT-0300 (Horário Padrão de Brasília)

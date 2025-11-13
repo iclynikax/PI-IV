@@ -527,6 +527,44 @@
 
 
   <script>
+
+    function gerarCategorias(tipo = 'hoje', dataReferencia = new Date()) {
+      const categorias = [];
+
+      const ano = dataReferencia.getFullYear();
+      const mes = dataReferencia.getMonth(); // zero-based
+      const dia = dataReferencia.getDate();
+
+      if (tipo === 'hoje') {
+        const mesStr = String(mes + 1).padStart(2, '0');
+        const diaStr = String(dia).padStart(2, '0');
+        for (let h = 0; h < 25; h++) {
+          const hora = String(h).padStart(2, '0');
+          categorias.push(`${ano}-${mesStr}-${diaStr}T${hora}:00:00.000Z`);
+        }
+
+      } else if (tipo === 'mes') {
+        const mesStr = String(mes + 1).padStart(2, '0');
+        const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+        for (let d = 1; d <= diasNoMes; d++) {
+          const diaStr = String(d).padStart(2, '0');
+          categorias.push(`${ano}-${mesStr}-${diaStr}T00:00:00.000Z`);
+        }
+
+      } else if (tipo === 'ano') {
+        for (let m = 0; m < 12; m++) {
+          const mesStr = String(m + 1).padStart(2, '0');
+          categorias.push(`${ano}-${mesStr}-01T00:00:00.000Z`);
+        }
+
+      } else {
+        console.warn(`Tipo inválido: ${tipo}. Use 'dia', 'mes' ou 'ano'.`);
+      }
+
+      return categorias;
+    }
+
+
     function acessaRelatorio(elemento) {
       const filtro = elemento.id;
 
